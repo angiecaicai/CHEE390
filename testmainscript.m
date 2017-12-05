@@ -29,6 +29,6 @@ kcst=0.37464+(1.54226.*w)-(0.26992.*(w.^2));
 alpha=(1+kcst.*(1-sqrt(Tr))).^2;
 ap=ac.*alpha;
 bp=bc;
-
+%github test
 %%
 [ xr,yr ] = calflash( 1379000,T,Pc,Tc,zn,w,ap,bp,ip );
