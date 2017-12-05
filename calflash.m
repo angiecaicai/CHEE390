@@ -1,12 +1,15 @@
-function [ xr,yr ] = calflash( P,T,Pc,Tc,zn,w,ap,bp,ip )
+function [ xn,yn,vap,liq,fail] = calflash( P,T,Pc,Tc,zn,w,ap,bp,ip )
 
 k=1;
 kmax=20;
 Ki=zeros(1,2);
 for i = 1:2
-        Ki(i) = exp(log(Pc(i)/P)+5.37*(1+w(i))*(1-Tc(i)/T));
+    Ki(i) = exp(log(Pc(i)/P)+5.37*(1+w(i))*(1-Tc(i)/T));
 end
 theta=zeros(kmax,1);
+vap=0;
+liq=0;
+fail=0;
 
 for k=1:kmax
     
@@ -81,18 +84,22 @@ for k=1:kmax
     end
     
     if abs(theta(k))<=1E-7
-        fprintf('Flash converged, mole fraction of carbon dioxide in vapor is %d, in liquid is %d.\n',yn(2),xn(2));
-        xr=xn;
-        yr=yn;
+        if xn==zn
+            liq=1;
+            break
+        end
+        %fprintf('Flash converged, mole fraction of carbon dioxide in vapor is %d, in liquid is %d.\n',yn(2),xn(2));
         break
     else
         if k~=1
             if abs(theta(k)-theta(k-1))<=1e-8
                 if theta(k)>0 && v==0
-                    fprintf('Feed is in liquid.\n');
+                    %fprintf('Feed is in liquid.\n');
+                    liq=1;
                     break
                 else if theta(k)<0 && v==1
-                        fprintf('Feed is in vapor.\n');
+                        %fprintf('Feed is in vapor.\n');
+                        vap=1;
                         break
                     end
                 end
@@ -107,11 +114,13 @@ for k=1:kmax
         end
         
         if k>=kmax
-            fprintf('Fail\n');
+            %fprintf('Fail\n');
+            fail=1;
             break
         end
     end
 end
+
 
 end
 
